@@ -13,7 +13,6 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -28,8 +27,14 @@ const emailSchema = yup.object().shape({
 });
 
 const passwordSchema = yup.object().shape({
-  password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-  confirmPassword: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Confirm password is required'),
+  password: yup
+    .string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password')], 'Passwords must match')
+    .required('Confirm password is required'),
 });
 
 export default function ForgotPasswordScreen() {
@@ -38,14 +43,14 @@ export default function ForgotPasswordScreen() {
   const handleOtpPaste = (pastedText: string, index: number) => {
     const digits = pastedText.replace(/\D/g, '').slice(0, 6);
     const newOtp = ['', '', '', '', '', ''];
-    
+
     // Fill the OTP array with pasted digits
     for (let i = 0; i < digits.length && i < 6; i++) {
       newOtp[i] = digits[i];
     }
-    
+
     setOtp(newOtp);
-    
+
     // Focus the last filled input or the next empty one
     const lastIndex = Math.min(digits.length - 1, 5);
     setTimeout(() => {
@@ -83,20 +88,20 @@ export default function ForgotPasswordScreen() {
       });
     }, 1000);
   };
-  
+
   const handleOtpChange = (value: string, index: number) => {
     // Handle pasted content (multiple characters)
     if (value.length > 1) {
       const digits = value.replace(/\D/g, '').slice(0, 6);
       const newOtp = ['', '', '', '', '', ''];
-      
+
       // Fill the OTP array with pasted digits
       for (let i = 0; i < digits.length && i < 6; i++) {
         newOtp[i] = digits[i];
       }
-      
+
       setOtp(newOtp);
-      
+
       // Focus the last filled input
       const lastIndex = Math.min(digits.length - 1, 5);
       setTimeout(() => {
@@ -104,7 +109,7 @@ export default function ForgotPasswordScreen() {
       }, 100);
       return;
     }
-    
+
     // Handle single character input
     const newOtp = [...otp];
     newOtp[index] = value.replace(/\D/g, ''); // Only allow digits
@@ -124,20 +129,23 @@ export default function ForgotPasswordScreen() {
       }, 10);
     }
   };
-  
+
   const handleSendOtp = async (values: { email: string }) => {
     setLoading(true);
-    
+
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/auth/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}/auth/forgot-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: values.email,
+          }),
         },
-        body: JSON.stringify({
-          email: values.email,
-        }),
-      });
+      );
 
       const data = await response.json();
 
@@ -148,20 +156,20 @@ export default function ForgotPasswordScreen() {
         showToast({
           message: 'Verification code sent to your email',
           type: 'success',
-          duration: 3000
+          duration: 3000,
         });
       } else {
         showToast({
           message: data.error || data.message || 'Failed to send OTP',
           type: 'error',
-          duration: 3000
+          duration: 3000,
         });
       }
     } catch (error) {
       showToast({
         message: 'Network error. Please try again.',
         type: 'error',
-        duration: 3000
+        duration: 3000,
       });
     } finally {
       setLoading(false);
@@ -170,19 +178,22 @@ export default function ForgotPasswordScreen() {
 
   const handleResendOtp = async () => {
     if (resendTimer > 0) return;
-    
+
     setIsResendingOtp(true);
-    
+
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/auth/resend-forgot-password-otp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}/auth/resend-forgot-password-otp`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: userEmail,
+          }),
         },
-        body: JSON.stringify({
-          email: userEmail,
-        }),
-      });
+      );
 
       const data = await response.json();
 
@@ -190,20 +201,20 @@ export default function ForgotPasswordScreen() {
         showToast({
           message: 'OTP resent successfully',
           type: 'success',
-          duration: 3000
+          duration: 3000,
         });
         startTimer();
       } else {
         showToast({
           message: data.message || 'Failed to resend OTP',
           type: 'error',
-          duration: 3000
+          duration: 3000,
         });
       }
     } catch (error) {
       showToast({
         message: 'Network error. Please try again.',
-        type: 'error'
+        type: 'error',
       });
     } finally {
       setIsResendingOtp(false);
@@ -213,65 +224,77 @@ export default function ForgotPasswordScreen() {
   const handleVerifyOtp = async () => {
     const otpCode = otp.join('');
     if (otpCode.length !== 6) {
-      showToast({ message: 'Please enter the complete verification code', type: 'error' });
+      showToast({
+        message: 'Please enter the complete verification code',
+        type: 'error',
+      });
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/auth/verify-forgot-password-otp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}/auth/verify-forgot-password-otp`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: userEmail,
+            otp: otpCode,
+          }),
         },
-        body: JSON.stringify({
-          email: userEmail,
-          otp: otpCode,
-        }),
-      });
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        showToast({ 
-          message: 'OTP verified successfully', 
+        showToast({
+          message: 'OTP verified successfully',
           type: 'success',
-          duration: 3000
+          duration: 3000,
         });
         setCurrentStep('password');
       } else {
         showToast({
           message: data.message || 'Invalid OTP. Please try again.',
           type: 'error',
-          duration: 3000
+          duration: 3000,
         });
       }
     } catch (error) {
       showToast({
         message: 'Network error. Please try again.',
-        type: 'error'
+        type: 'error',
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResetPassword = async (values: { password: string; confirmPassword: string }) => {
+  const handleResetPassword = async (values: {
+    password: string;
+    confirmPassword: string;
+  }) => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/auth/reset-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}/auth/reset-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: userEmail,
+            password: values.password,
+            confirmPassword: values.confirmPassword,
+          }),
         },
-        body: JSON.stringify({
-          email: userEmail,
-          password: values.password,
-          confirmPassword: values.confirmPassword,
-        }),
-      });
+      );
 
       const data = await response.json();
 
@@ -279,13 +302,26 @@ export default function ForgotPasswordScreen() {
         showToast({
           message: 'Password reset successfully!',
           type: 'success',
-          duration: 3000
+          duration: 3000,
         });
 
         Animated.parallel([
-          Animated.timing(fadeAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
-          Animated.spring(scaleAnim, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true }),
-          Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.spring(scaleAnim, {
+            toValue: 1,
+            tension: 50,
+            friction: 7,
+            useNativeDriver: true,
+          }),
+          Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
         ]).start();
 
         setTimeout(() => {
@@ -295,13 +331,13 @@ export default function ForgotPasswordScreen() {
         showToast({
           message: data.message || 'Failed to reset password',
           type: 'error',
-          duration: 3000
+          duration: 3000,
         });
       }
     } catch (error) {
       showToast({
         message: 'Network error. Please try again.',
-        type: 'error'
+        type: 'error',
       });
     } finally {
       setLoading(false);
@@ -312,29 +348,48 @@ export default function ForgotPasswordScreen() {
     <View style={styles.stepIndicator}>
       {['email', 'otp', 'password', 'success'].map((step, index) => (
         <View key={step} style={styles.stepContainer}>
-          <View style={[
-            styles.stepCircle,
-            currentStep === step && styles.activeStep,
-            ['otp', 'password', 'success'].includes(currentStep) && index === 0 && styles.completedStep,
-            ['password', 'success'].includes(currentStep) && index === 1 && styles.completedStep,
-            currentStep === 'success' && index === 2 && styles.completedStep,
-          ]}>
-            <Text style={[
-              styles.stepNumber,
-              (currentStep === step || 
-               (['otp', 'password', 'success'].includes(currentStep) && index === 0) ||
-               (['password', 'success'].includes(currentStep) && index === 1) ||
-               (currentStep === 'success' && index === 2)) && styles.activeStepText
-            ]}>
+          <View
+            style={[
+              styles.stepCircle,
+              currentStep === step && styles.activeStep,
+              ['otp', 'password', 'success'].includes(currentStep) &&
+                index === 0 &&
+                styles.completedStep,
+              ['password', 'success'].includes(currentStep) &&
+                index === 1 &&
+                styles.completedStep,
+              currentStep === 'success' && index === 2 && styles.completedStep,
+            ]}
+          >
+            <Text
+              style={[
+                styles.stepNumber,
+                (currentStep === step ||
+                  (['otp', 'password', 'success'].includes(currentStep) &&
+                    index === 0) ||
+                  (['password', 'success'].includes(currentStep) &&
+                    index === 1) ||
+                  (currentStep === 'success' && index === 2)) &&
+                  styles.activeStepText,
+              ]}
+            >
               {index + 1}
             </Text>
           </View>
-          {index < 3 && <View style={[
-            styles.stepLine,
-            (['otp', 'password', 'success'].includes(currentStep) && index === 0) ||
-            (['password', 'success'].includes(currentStep) && index === 1) ||
-            (currentStep === 'success' && index === 2) ? styles.completedLine : {}
-          ]} />}
+          {index < 3 && (
+            <View
+              style={[
+                styles.stepLine,
+                (['otp', 'password', 'success'].includes(currentStep) &&
+                  index === 0) ||
+                (['password', 'success'].includes(currentStep) &&
+                  index === 1) ||
+                (currentStep === 'success' && index === 2)
+                  ? styles.completedLine
+                  : {},
+              ]}
+            />
+          )}
         </View>
       ))}
     </View>
@@ -346,14 +401,23 @@ export default function ForgotPasswordScreen() {
       validationSchema={emailSchema}
       onSubmit={handleSendOtp}
     >
-      {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+      {({
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        values,
+        errors,
+        touched,
+      }) => (
         <View style={styles.stepContent}>
           <View style={styles.heroSection}>
             <View style={styles.iconContainer}>
               <KeyRound size={32} color="#6366f1" />
             </View>
             <Text style={styles.stepTitle}>Reset Your Password</Text>
-            <Text style={styles.stepSubtitle}>Enter your email to receive a verification code</Text>
+            <Text style={styles.stepSubtitle}>
+              Enter your email to receive a verification code
+            </Text>
           </View>
 
           <View style={styles.formContainer}>
@@ -382,14 +446,11 @@ export default function ForgotPasswordScreen() {
               onPress={() => handleSubmit()}
               disabled={loading}
             >
-              <LinearGradient
-                colors={['#6366f1', '#8b5cf6']}
-                style={styles.buttonGradient}
-              >
+              <View style={styles.buttonGradient}>
                 <Text style={styles.buttonText}>
                   {loading ? 'Sending...' : 'Send Verification Code'}
                 </Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -397,7 +458,7 @@ export default function ForgotPasswordScreen() {
     </Formik>
   );
 
- const renderOtpStep = () => (
+  const renderOtpStep = () => (
     <View style={styles.stepContent}>
       <View style={styles.heroSection}>
         <View style={styles.iconContainer}>
@@ -413,7 +474,9 @@ export default function ForgotPasswordScreen() {
         {otp.map((digit, index) => (
           <TextInput
             key={index}
-            ref={(ref) => { otpInputs.current[index] = ref; }}
+            ref={(ref) => {
+              otpInputs.current[index] = ref;
+            }}
             style={styles.otpInput}
             value={digit}
             onChangeText={(value) => handleOtpChange(value, index)}
@@ -431,33 +494,29 @@ export default function ForgotPasswordScreen() {
         ))}
       </View>
 
-      <TouchableOpacity 
-        style={[styles.primaryButton, loading && styles.disabledButton]} 
+      <TouchableOpacity
+        style={[styles.primaryButton, loading && styles.disabledButton]}
         onPress={handleVerifyOtp}
         disabled={loading || otp.join('').length !== 6}
       >
-        <LinearGradient
-          colors={['#6366f1', '#8b5cf6']}
-          style={styles.buttonGradient}
-        >
+        <View style={styles.buttonGradient}>
           <Text style={styles.buttonText}>
             {loading ? 'Verifying...' : 'Verify Code'}
           </Text>
-        </LinearGradient>
+        </View>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={styles.secondaryButton} 
+      <TouchableOpacity
+        style={styles.secondaryButton}
         onPress={handleResendOtp}
         disabled={resendTimer > 0 || isResendingOtp}
       >
         <Text style={styles.secondaryButtonText}>
-          {isResendingOtp 
-            ? 'Sending...' 
-            : resendTimer > 0 
-              ? `Resend in ${resendTimer}s` 
-              : 'Resend Code'
-          }
+          {isResendingOtp
+            ? 'Sending...'
+            : resendTimer > 0
+              ? `Resend in ${resendTimer}s`
+              : 'Resend Code'}
         </Text>
       </TouchableOpacity>
     </View>
@@ -472,14 +531,23 @@ export default function ForgotPasswordScreen() {
       validationSchema={passwordSchema}
       onSubmit={handleResetPassword}
     >
-      {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+      {({
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        values,
+        errors,
+        touched,
+      }) => (
         <View style={styles.stepContent}>
           <View style={styles.heroSection}>
             <View style={styles.iconContainer}>
               <Lock size={32} color="#6366f1" />
             </View>
             <Text style={styles.stepTitle}>Create New Password</Text>
-            <Text style={styles.stepSubtitle}>Enter a new secure password for your account</Text>
+            <Text style={styles.stepSubtitle}>
+              Enter a new secure password for your account
+            </Text>
           </View>
 
           <View style={styles.formContainer}>
@@ -546,14 +614,11 @@ export default function ForgotPasswordScreen() {
               onPress={() => handleSubmit()}
               disabled={loading}
             >
-              <LinearGradient
-                colors={['#6366f1', '#8b5cf6']}
-                style={styles.buttonGradient}
-              >
+              <View style={styles.buttonGradient}>
                 <Text style={styles.buttonText}>
                   {loading ? 'Resetting...' : 'Reset Password'}
                 </Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -562,16 +627,13 @@ export default function ForgotPasswordScreen() {
   );
 
   const renderSuccessStep = () => (
-    <Animated.View 
+    <Animated.View
       style={[
         styles.stepContent,
         {
           opacity: fadeAnim,
-          transform: [
-            { scale: scaleAnim },
-            { translateY: slideAnim }
-          ]
-        }
+          transform: [{ scale: scaleAnim }, { translateY: slideAnim }],
+        },
       ]}
     >
       <View style={styles.heroSection}>
@@ -608,7 +670,7 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <LinearGradient colors={['#667eea', '#764ba2']} style={styles.container}>
+    <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <KeyboardAvoidingView
@@ -628,7 +690,7 @@ export default function ForgotPasswordScreen() {
                   else router.back();
                 }}
               >
-                <ArrowLeft color="#FFFFFF" size={24} />
+                <ArrowLeft color="#4F46E5" size={24} />
               </TouchableOpacity>
 
               <View style={styles.header}>
@@ -636,14 +698,12 @@ export default function ForgotPasswordScreen() {
                 {renderStepIndicator()}
               </View>
 
-              <View style={styles.content}>
-                {renderCurrentStep()}
-              </View>
+              <View style={styles.content}>{renderCurrentStep()}</View>
             </ScrollView>
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -651,6 +711,7 @@ export default function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F8FAFC',
   },
   safeArea: {
     flex: 1,
@@ -679,7 +740,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#1f2937',
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -696,32 +757,32 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: '#E5E7EB',
     alignItems: 'center',
     justifyContent: 'center',
   },
   activeStep: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#4F46E5',
   },
   completedStep: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#4F46E5',
   },
   stepNumber: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ffffff',
+    color: '#374151',
   },
   activeStepText: {
-    color: '#6366f1',
+    color: '#ffffff',
   },
   stepLine: {
     width: 24,
     height: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: '#D1D5DB',
     marginHorizontal: 4,
   },
   completedLine: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#4F46E5',
   },
   content: {
     flex: 1,
@@ -830,6 +891,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   buttonGradient: {
+    backgroundColor: '#4F46E5',
     paddingVertical: 18,
     paddingHorizontal: 32,
     alignItems: 'center',

@@ -12,17 +12,25 @@ import {
   Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import { Lock, Eye, EyeOff, ArrowLeft, Heart, TriangleAlert as AlertTriangle } from 'lucide-react-native';
+import {
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  Heart,
+  TriangleAlert as AlertTriangle,
+} from 'lucide-react-native';
 import { useToast } from '@/components/ToastProvider';
 import { supabase } from '@/lib/supabase';
 import { API_CONFIG } from '@/config/config';
 
 const passwordSchema = yup.object().shape({
-  password: yup.string().required('Password is required to delete your account'),
+  password: yup
+    .string()
+    .required('Password is required to delete your account'),
 });
 
 export default function DeleteAccountConfirmation() {
@@ -37,12 +45,12 @@ export default function DeleteAccountConfirmation() {
       // First verify the password by attempting to sign in
       const { data: sessionData } = await supabase.auth.getSession();
       const currentUser = sessionData?.session?.user;
-      
+
       if (!currentUser) {
         showToast({
           message: 'You must be logged in to delete your account.',
           type: 'error',
-          duration: 3000
+          duration: 3000,
         });
         setLoading(false);
         return;
@@ -58,7 +66,7 @@ export default function DeleteAccountConfirmation() {
         showToast({
           message: 'Incorrect password. Please try again.',
           type: 'error',
-          duration: 3000
+          duration: 3000,
         });
         setLoading(false);
         return;
@@ -67,13 +75,16 @@ export default function DeleteAccountConfirmation() {
       // If password is correct, proceed with account deletion
       const accessToken = sessionData?.session?.access_token;
 
-      const response = await fetch(`${API_CONFIG.BASE_URL}/users/${currentUser.id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}/users/${currentUser.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -82,21 +93,20 @@ export default function DeleteAccountConfirmation() {
 
       // Sign out from Supabase
       await supabase.auth.signOut();
-      
+
       showToast({
-        message: 'Account deleted successfully. We\'re sorry to see you go!',
+        message: "Account deleted successfully. We're sorry to see you go!",
         type: 'success',
-        duration: 4000
+        duration: 4000,
       });
 
-      // Navigate to login screen
       router.replace('/auth/login');
     } catch (error) {
       console.error('Delete account error:', error);
       showToast({
         message: 'Failed to delete account. Please try again.',
         type: 'error',
-        duration: 3000
+        duration: 3000,
       });
     } finally {
       setLoading(false);
@@ -104,7 +114,7 @@ export default function DeleteAccountConfirmation() {
   };
 
   return (
-    <LinearGradient colors={['#667eea', '#764ba2']} style={styles.container}>
+    <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -120,7 +130,7 @@ export default function DeleteAccountConfirmation() {
                 style={styles.backButton}
                 onPress={() => router.back()}
               >
-                <ArrowLeft color="#FFFFFF" size={24} />
+                <ArrowLeft color="#4F46E5" size={24} />
               </TouchableOpacity>
 
               <View style={styles.header}>
@@ -134,7 +144,8 @@ export default function DeleteAccountConfirmation() {
                   </View>
                   <Text style={styles.stepTitle}>Before You Leave...</Text>
                   <Text style={styles.stepSubtitle}>
-                    We'd love to keep you! Is there anything we can do to improve your experience?
+                    We'd love to keep you! Is there anything we can do to
+                    improve your experience?
                   </Text>
                 </View>
 
@@ -143,19 +154,22 @@ export default function DeleteAccountConfirmation() {
                   <View style={styles.encouragementItem}>
                     <Text style={styles.encouragementEmoji}>🌟</Text>
                     <Text style={styles.encouragementText}>
-                      We're constantly improving our services based on your feedback
+                      We're constantly improving our services based on your
+                      feedback
                     </Text>
                   </View>
                   <View style={styles.encouragementItem}>
                     <Text style={styles.encouragementEmoji}>💬</Text>
                     <Text style={styles.encouragementText}>
-                      Our support team is here to help with any issues you might have
+                      Our support team is here to help with any issues you might
+                      have
                     </Text>
                   </View>
                   <View style={styles.encouragementItem}>
                     <Text style={styles.encouragementEmoji}>🎯</Text>
                     <Text style={styles.encouragementText}>
-                      You'll lose access to all your order history and preferences
+                      You'll lose access to all your order history and
+                      preferences
                     </Text>
                   </View>
                 </View>
@@ -164,10 +178,13 @@ export default function DeleteAccountConfirmation() {
                 <View style={styles.warningSection}>
                   <View style={styles.warningHeader}>
                     <AlertTriangle size={20} color="#ef4444" />
-                    <Text style={styles.warningTitle}>This action cannot be undone</Text>
+                    <Text style={styles.warningTitle}>
+                      This action cannot be undone
+                    </Text>
                   </View>
                   <Text style={styles.warningText}>
-                    All your data, order history, and account information will be permanently deleted.
+                    All your data, order history, and account information will
+                    be permanently deleted.
                   </Text>
                 </View>
 
@@ -176,12 +193,25 @@ export default function DeleteAccountConfirmation() {
                   validationSchema={passwordSchema}
                   onSubmit={handleDeleteAccount}
                 >
-                  {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+                  {({
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                    values,
+                    errors,
+                    touched,
+                  }) => (
                     <View style={styles.formContainer}>
                       <View style={styles.inputContainer}>
-                        <Text style={styles.inputLabel}>Confirm Your Password</Text>
+                        <Text style={styles.inputLabel}>
+                          Confirm Your Password
+                        </Text>
                         <View style={styles.inputWrapper}>
-                          <Lock size={20} color="#6b7280" style={styles.inputIcon} />
+                          <Lock
+                            size={20}
+                            color="#6b7280"
+                            style={styles.inputIcon}
+                          />
                           <TextInput
                             style={styles.input}
                             placeholder="Enter your password to confirm"
@@ -203,7 +233,9 @@ export default function DeleteAccountConfirmation() {
                           </TouchableOpacity>
                         </View>
                         {touched.password && errors.password && (
-                          <Text style={styles.errorText}>{errors.password}</Text>
+                          <Text style={styles.errorText}>
+                            {errors.password}
+                          </Text>
                         )}
                       </View>
 
@@ -212,22 +244,24 @@ export default function DeleteAccountConfirmation() {
                           style={styles.cancelButton}
                           onPress={() => router.back()}
                         >
-                          <Text style={styles.cancelButtonText}>Keep My Account</Text>
+                          <Text style={styles.cancelButtonText}>
+                            Keep My Account
+                          </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          style={[styles.deleteButton, loading && styles.disabledButton]}
+                          style={[
+                            styles.deleteButton,
+                            loading && styles.disabledButton,
+                          ]}
                           onPress={() => handleSubmit()}
                           disabled={loading}
                         >
-                          <LinearGradient
-                            colors={['#ef4444', '#dc2626']}
-                            style={styles.buttonGradient}
-                          >
+                          <View style={styles.buttonGradient}>
                             <Text style={styles.deleteButtonText}>
                               {loading ? 'Deleting...' : 'Delete My Account'}
                             </Text>
-                          </LinearGradient>
+                          </View>
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -238,13 +272,14 @@ export default function DeleteAccountConfirmation() {
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F8FAFC',
   },
   safeArea: {
     flex: 1,
@@ -273,7 +308,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#1f2937',
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -420,6 +455,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   buttonGradient: {
+    backgroundColor: '#DC2626',
     paddingVertical: 18,
     paddingHorizontal: 32,
     alignItems: 'center',

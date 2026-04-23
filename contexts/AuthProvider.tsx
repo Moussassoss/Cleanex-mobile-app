@@ -8,7 +8,6 @@ import React, {
 import { View, Text } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface AuthContextType {
   user: any | null;
@@ -35,25 +34,16 @@ export function AuthProvider({ children }: Props) {
   const [loading, setLoading] = useState(true);
 
   /**
-   * 🔐 Initialize auth ONCE on app start
-   * Enforces Remember Me BEFORE rendering any UI
+   * Initialize auth once on app start.
+   * Session persistence is handled by Supabase + AsyncStorage in the client.
    */
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const rememberMe = await AsyncStorage.getItem('rememberMe');
-
         const {
           data: { session },
         } = await supabase.auth.getSession();
-
-        // 🚨 Session exists but Remember Me is OFF → force logout
-        if (session && rememberMe !== 'true') {
-          await supabase.auth.signOut();
-          setUser(null);
-        } else {
-          setUser(session?.user ?? null);
-        }
+        setUser(session?.user ?? null);
       } catch (error) {
         console.error('Auth init error:', error);
         setUser(null);
@@ -68,7 +58,7 @@ export function AuthProvider({ children }: Props) {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null);
-      }
+      },
     );
 
     return () => {
@@ -94,7 +84,6 @@ export function AuthProvider({ children }: Props) {
    */
   async function signOut() {
     try {
-      await AsyncStorage.removeItem('rememberMe');
       await supabase.auth.signOut();
       setUser(null);
       router.replace('/');

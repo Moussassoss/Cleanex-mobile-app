@@ -15,7 +15,6 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -23,6 +22,7 @@ import { User, Mail, Phone, MapPin, Lock, Eye, EyeOff, Check, Star, ArrowLeft } 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useToast } from '@/components/ToastProvider';
 import { API_CONFIG } from '@/config/config';
+import { supabase } from '@/lib/supabase';
 
 type Step = 'details' | 'verification' | 'password' | 'success';
 
@@ -274,8 +274,13 @@ export default function RegisterScreen() {
           Animated.timing(slideAnim, { toValue: 0, duration: 1000, useNativeDriver: true }),
         ]).start();
 
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: values.password,
+        });
+
         setTimeout(() => {
-          router.replace('/auth/login');
+          router.replace(signInError ? '/auth/login' : '/(tabs)/home');
         }, 2000);
       } else {
         showToast({
@@ -476,14 +481,11 @@ export default function RegisterScreen() {
               onPress={() => handleSubmit()}
               disabled={loading}
             >
-              <LinearGradient
-                colors={['#6366f1', '#8b5cf6']}
-                style={styles.buttonGradient}
-              >
+              <View style={styles.buttonGradient}>
                 <Text style={styles.buttonText}>
                   {loading ? 'Sending...' : 'Continue'}
                 </Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -532,14 +534,11 @@ export default function RegisterScreen() {
       onPress={handleOtpSubmit}
       disabled={loading}
     >
-      <LinearGradient
-        colors={['#6366f1', '#8b5cf6']}
-        style={styles.buttonGradient}
-      >
+      <View style={styles.buttonGradient}>
         <Text style={styles.buttonText}>
           {loading ? 'Verifying...' : 'Verify Code'}
         </Text>
-      </LinearGradient>
+      </View>
     </TouchableOpacity>
 
     <TouchableOpacity 
@@ -640,14 +639,11 @@ export default function RegisterScreen() {
               onPress={() => handleSubmit()}
               disabled={loading}
             >
-              <LinearGradient
-                colors={['#6366f1', '#8b5cf6']}
-                style={styles.buttonGradient}
-              >
+              <View style={styles.buttonGradient}>
                 <Text style={styles.buttonText}>
                   {loading ? 'Creating Account...' : 'Create Account'}
                 </Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -692,12 +688,9 @@ export default function RegisterScreen() {
       </View>
 
       <TouchableOpacity style={styles.primaryButton} onPress={() => router.replace('/auth/login')}>
-        <LinearGradient
-          colors={['#10b981', '#059669']}
-          style={styles.buttonGradient}
-        >
+        <View style={[styles.buttonGradient, styles.successButton]}>
           <Text style={styles.buttonText}>Get Started</Text>
-        </LinearGradient>
+        </View>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -718,7 +711,7 @@ export default function RegisterScreen() {
   };
 
   return (
-    <LinearGradient colors={['#667eea', '#764ba2']} style={styles.container}>
+    <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -741,7 +734,7 @@ export default function RegisterScreen() {
                     else router.back();
                   }}
                 >
-                  <ArrowLeft color="#FFFFFF" size={24} />
+                  <ArrowLeft color="#4F46E5" size={24} />
                 </TouchableOpacity>
               )}
 
@@ -758,13 +751,14 @@ export default function RegisterScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F8FAFC',
   },
   safeArea: {
     flex: 1,
@@ -785,7 +779,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#1f2937',
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -802,7 +796,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: '#E5E7EB',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -838,27 +832,27 @@ linkText: {
 },
   
   activeStep: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#4F46E5',
   },
   completedStep: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#4F46E5',
   },
   stepNumber: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ffffff',
+    color: '#374151',
   },
   activeStepText: {
-    color: '#6366f1',
+    color: '#ffffff',
   },
   stepLine: {
     width: 24,
     height: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: '#D1D5DB',
     marginHorizontal: 4,
   },
   completedLine: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#4F46E5',
   },
   content: {
     flex: 1,
@@ -960,10 +954,14 @@ linkText: {
     elevation: 6,
   },
   buttonGradient: {
+    backgroundColor: '#4F46E5',
     paddingVertical: 18,
     paddingHorizontal: 32,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  successButton: {
+    backgroundColor: '#10B981',
   },
   buttonText: {
     fontSize: 16,
