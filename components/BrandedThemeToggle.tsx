@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Moon, Sun } from 'lucide-react-native';
 
 interface BrandedThemeToggleProps {
@@ -28,21 +28,20 @@ export default function BrandedThemeToggle({
       <View className="flex-row items-center">
         <View className="items-center">
           <Sun size={16} color={isDarkMode ? '#9CA3AF' : '#F59E0B'} />
-          <Text className={`text-[10px] font-inter mt-1 ${isDarkMode ? 'text-gray-400' : 'text-amber-700'}`}>
+          <Text
+            className={`text-[10px] font-inter mt-1 ${isDarkMode ? 'text-gray-400' : 'text-amber-700'}`}
+          >
             Light
           </Text>
         </View>
 
-        <View className="mx-3 items-center justify-center">
-          <Image
-            source={require('@/assets/images/logo.png')}
-            style={{ width: 24, height: 24, resizeMode: 'contain' }}
-          />
-        </View>
+        <View className="mx-4" />
 
         <View className="items-center">
           <Moon size={16} color={isDarkMode ? '#3B82F6' : '#9CA3AF'} />
-          <Text className={`text-[10px] font-inter mt-1 ${isDarkMode ? 'text-blue-700' : 'text-gray-400'}`}>
+          <Text
+            className={`text-[10px] font-inter mt-1 ${isDarkMode ? 'text-blue-700' : 'text-gray-400'}`}
+          >
             Dark
           </Text>
         </View>
