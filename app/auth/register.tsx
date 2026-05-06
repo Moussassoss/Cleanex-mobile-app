@@ -7,7 +7,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Alert,
   Keyboard,
   TouchableWithoutFeedback,
@@ -717,38 +716,33 @@ export default function RegisterScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardView}
         >
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="always"
-            scrollEnabled={true}
-          >
+          <View style={styles.content}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <View style={{ flex: 1 }}>
-              {currentStep !== 'details' && (
-                <TouchableOpacity
-                  style={styles.backButton}
-                  onPress={() => {
-                    if (currentStep === 'verification') setCurrentStep('details');
-                    else if (currentStep === 'password') setCurrentStep('verification');
-                    else router.back();
-                  }}
-                >
-                  <ArrowLeft color="#4F46E5" size={24} />
-                </TouchableOpacity>
-              )}
+                {currentStep !== 'details' && (
+                  <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => {
+                      if (currentStep === 'verification') setCurrentStep('details');
+                      else if (currentStep === 'password') setCurrentStep('verification');
+                      else router.back();
+                    }}
+                  >
+                    <ArrowLeft color="#4F46E5" size={24} />
+                  </TouchableOpacity>
+                )}
 
-              <View style={styles.header}>
-                <Text style={styles.title}>Join Us</Text>
-                {renderStepIndicator()}
-              </View>
+                <View style={styles.header}>
+                  <Text style={styles.title}>Join Us</Text>
+                  {renderStepIndicator()}
+                </View>
 
-              <View style={styles.content}>
-                {renderCurrentStep()}
-              </View>
+                <View style={styles.formArea}>
+                  {renderCurrentStep()}
+                </View>
               </View>
             </TouchableWithoutFeedback>
-          </ScrollView>
+          </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
@@ -766,21 +760,20 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 40,
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 12,
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#1f2937',
-    marginBottom: 24,
+    marginBottom: 8,
     textAlign: 'center',
   },
   stepIndicator: {
@@ -793,44 +786,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stepCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: '#E5E7EB',
     alignItems: 'center',
     justifyContent: 'center',
   },
-checkboxContainer: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: 16,
-  marginBottom: 8,
-},
-checkbox: {
-  width: 20,
-  height: 20,
-  borderRadius: 4,
-  borderWidth: 1,
-  borderColor: '#6b7280',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginRight: 12,
-},
-checked: {
-  backgroundColor: '#6366f1',
-  borderColor: '#6366f1',
-},
-checkboxText: {
-  fontSize: 14,
-  color: '#6b7280',
-  flex: 1,
-  flexWrap: 'wrap',
-},
-linkText: {
-  color: '#6366f1',
-  textDecorationLine: 'underline',
-},
-  
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#6b7280',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  checked: {
+    backgroundColor: '#6366f1',
+    borderColor: '#6366f1',
+  },
+  checkboxText: {
+    fontSize: 12,
+    color: '#6b7280',
+    flex: 1,
+    flexWrap: 'wrap',
+  },
+  linkText: {
+    color: '#6366f1',
+    textDecorationLine: 'underline',
+  },
   activeStep: {
     backgroundColor: '#4F46E5',
   },
@@ -838,7 +830,7 @@ linkText: {
     backgroundColor: '#4F46E5',
   },
   stepNumber: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
     color: '#374151',
   },
@@ -846,82 +838,78 @@ linkText: {
     color: '#ffffff',
   },
   stepLine: {
-    width: 24,
+    width: 20,
     height: 2,
     backgroundColor: '#D1D5DB',
-    marginHorizontal: 4,
+    marginHorizontal: 2,
   },
   completedLine: {
     backgroundColor: '#4F46E5',
   },
-  content: {
+  formArea: {
     flex: 1,
   },
   stepContent: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 8,
+    borderRadius: 16,
+    padding: 16,
+    flex: 1,
+    justifyContent: 'space-between',
   },
   heroSection: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 12,
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#f0f9ff',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   successIcon: {
     backgroundColor: '#f0fdf4',
   },
   stepTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#1f2937',
-    marginBottom: 8,
+    marginBottom: 4,
     textAlign: 'center',
   },
   stepSubtitle: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#6b7280',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 20,
   },
   formContainer: {
-    gap: 16,
+    gap: 8,
   },
   inputContainer: {
-    marginBottom: 4,
+    marginBottom: 2,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f9fafb',
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#e5e7eb',
-    paddingHorizontal: 16,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 2,
   },
   inputIcon: {
-    marginRight: 12,
+    marginRight: 8,
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     color: '#1f2937',
-    paddingVertical: 16,
-    lineHeight: 20,
+    paddingVertical: 10,
+    lineHeight: 18,
   },
   eyeIcon: {
     padding: 4,
@@ -929,34 +917,34 @@ linkText: {
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 32,
-    paddingHorizontal: 8,
+    marginBottom: 16,
+    paddingHorizontal: 4,
   },
   otpInput: {
-    width: 48,
-    height: 56,
-    borderRadius: 12,
+    width: 40,
+    height: 48,
+    borderRadius: 10,
     backgroundColor: '#f9fafb',
     borderWidth: 2,
     borderColor: '#e5e7eb',
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '600',
     color: '#1f2937',
     textAlign: 'center',
   },
   primaryButton: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
     shadowColor: '#6366f1',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   buttonGradient: {
     backgroundColor: '#4F46E5',
-    paddingVertical: 18,
-    paddingHorizontal: 32,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -964,7 +952,7 @@ linkText: {
     backgroundColor: '#10B981',
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#ffffff',
   },
@@ -972,19 +960,19 @@ linkText: {
     opacity: 0.6,
   },
   secondaryButton: {
-    marginTop: 16,
+    marginTop: 8,
     alignItems: 'center',
   },
   secondaryButtonText: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#6366f1',
     fontWeight: '500',
   },
   celebrationContainer: {
     position: 'relative',
     alignItems: 'center',
-    marginBottom: 32,
-    paddingVertical: 24,
+    marginBottom: 16,
+    paddingVertical: 12,
   },
   starsContainer: {
     position: 'absolute',
@@ -995,18 +983,18 @@ linkText: {
     position: 'absolute',
   },
   welcomeText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#1f2937',
     textAlign: 'center',
     fontWeight: '500',
-    lineHeight: 28,
+    lineHeight: 24,
   },
   backButton: {
     position: 'absolute',
-    top: 20,
-    left: 24,
+    top: 0,
+    left: 0,
     zIndex: 10,
-    padding: 8,
+    padding: 4,
   },
   backButtonText: {
     fontSize: 16,
@@ -1015,8 +1003,8 @@ linkText: {
   },
   errorText: {
     color: '#ef4444',
-    fontSize: 12,
-    marginTop: 4,
-    marginLeft: 8,
+    fontSize: 11,
+    marginTop: 2,
+    marginLeft: 4,
   },
 });
